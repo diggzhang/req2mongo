@@ -3,8 +3,11 @@
 //log plugin
 const bunyan = require("bunyan");
 //Execute a callback when a request closes, finishes, or errors
-const onFinished = require('on-finished');
-const MongoClient = require('mongodb').MongoClient;
+const onFinished = require("on-finished");
+const MongoClient = require("mongodb").MongoClient;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const Mixed = Schema.Types.Mixed;
 
 
 function createOrUseLogger(logger) {
@@ -48,21 +51,26 @@ module.exports = function (loggerInstance) {
         loggerInstance['logmongoport'] + "/" +
         loggerInstance['logmongodb'];
 
+    const opt = {
+        server: {
+            socketOptions: {keepAlive: 1},
+            poolSize: 100
+        }
+    };
+
+    mongoose.connect(loggerInstance.logmongolink, opt);
+    loggerInstance['msg'] = mongoose.model('Log', {
+        url: {type: String},
+        request: {type: Mixed},
+        response: {type: Mixed},
+        method: {type: String},
+        status: {type: Number}
+    });
+
     return function *logger(next) {
         this.log = loggerInstance;
         yield *next;
     };
-};
-
-function saveToMongo(config, msg) {
-    MongoClient.connect(config.logmongolink, function (err, db) {
-        if (err) throw err;
-        let collection = db.collection(config.logmongocollection);
-        collection.insert(msg, function (err, docs) {
-            if (err) throw err;
-            db.close();
-        });
-    });
 };
 
 module.exports.logSniffer = function () {
@@ -79,7 +87,12 @@ module.exports.logSniffer = function () {
                 status: this.status,
             };
             console.log(logMsg);
-            saveToMongo(this.log, logMsg);
+            let log = new this.log.msg(logMsg);
+            log.save(function (err) {
+                if (err) {
+                    console.error(err);
+                }
+            });
         };
 
         try {
