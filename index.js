@@ -4,7 +4,6 @@
 const bunyan = require("bunyan");
 //Execute a callback when a request closes, finishes, or errors
 const onFinished = require("on-finished");
-const MongoClient = require("mongodb").MongoClient;
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Mixed = Schema.Types.Mixed;
