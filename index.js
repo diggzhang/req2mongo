@@ -77,22 +77,25 @@ module.exports.logSniffer = function () {
     return function *logSniffer(next) {
         let err;
 
+
         let onResponseFinished = function () {
-            let logMsg = {
-                url: this.request.originalUrl,
-                request: this.request.body,
-                response: this.response.body,
-                method: this.request.method,
-                status: this.status,
-            };
-            console.log(logMsg);
-            let log = new this.log.msg(logMsg);
-            log.save(function (err) {
-                if (err) {
-                    console.error(err);
-                }
-            });
+
+           let logMsg = {
+               url: this.request.originalUrl,
+               request: this.request.body,
+               response: this.response.body,
+               method: this.request.method,
+               status: this.status,
+           };
+           console.log(logMsg);
+           let log = new this.log.msg(logMsg);
+           log.save(function (err) {
+               if (err) {
+                   console.error(err);
+               }
+           });
         };
+
 
         try {
             yield *next;
@@ -107,3 +110,24 @@ module.exports.logSniffer = function () {
         };
     };
 };
+
+
+mongoose.connection.on('error', err => {
+    console.error(err);
+    console.info('Exit process');
+    process.exit(1);
+});
+
+mongoose.connection.on('disconnected', () => {
+    console.error('Log Database disconnected');
+    process.exit(1);
+});
+
+process.on('SIGINT', () => {
+    console.warn('app exit');
+    if (mongoose.connection.readyState === 1) {
+        mongoose.connection.close();
+    } else {
+        process.exit(0);
+    }
+});
