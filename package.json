@@ -15,5 +15,10 @@
     "log"
   ],
   "author": "diggzhang",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "bunyan": "^1.8.0",
+    "mongodb": "^2.1.13",
+    "on-finished": "^2.3.0"
+  }
 }
