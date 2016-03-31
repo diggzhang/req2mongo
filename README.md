@@ -11,6 +11,8 @@ Credits and inspired by:
 * [koa-json-logger](https://github.com/rudijs/koa-json-logger)
 
 
+## Not ready to use 
+
 Code review, suggestions and pull requests very much welcome - thanks!
 
 ## Install 
@@ -39,3 +41,10 @@ app
 ## Todo
 
 [] test case
+
+## Bug
+
+```
+connection error: { [Error: Trying to open unclosed connection.] state: 1 }
+
+```
