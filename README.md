@@ -24,16 +24,18 @@ My code is really simple and easy to use, `index.js` is best readme file.
 
 ```javascript
 const req2mongo = require('req2mongo')
-const bunyan =require('bunyan')
-const appLoggerTag = bunyan.createLogger({name:'newLog', mongoHost:'10.8.8.111', mongoDB:'testLog', mongoPort:27017, mongoCollection:'logs'})
+const appLoggerTag = {name:'newLog', mongoHost:'10.8.8.111', mongoDB:'testLog', mongoPort:27017, mongoCollection:'logs'}
 
 ...
 
 app
     ...
-    .use(req2mongo(appLoggerTag))
-    .use(req2mongo.logSniffer())
+    .use(req2mongo(appLoggerTag))   // mongo configure
+    .use(req2mongo.logSniffer())    // sniffer any req/res save to mongo
     ...
     
 ```
 
+## Todo
+
+[] test case
