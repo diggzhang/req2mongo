@@ -1,11 +1,9 @@
 "use strict";
 
 /*
- * bunyan      - log plugin
  * on-finished - execute a callback when a request closes, finishes, or errors
  * mongoose    - mongodb driver
  */
-const bunyan = require("bunyan");
 const onFinished = require("on-finished");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
@@ -16,18 +14,6 @@ const mongooseOpt = {
         poolSize: 100
     }
 };
-
-
-function createOrUseLogger(logger) {
-    if (!logger || logger.info || !logger.child) {
-        let loggerOpts = logger || {};
-        loggerOpts.name = loggerOpts.name || 'defaultLog';
-        logger = bunyan.createLogger(loggerOpts);
-    };
-
-    return logger;
-};
-
 
 /*
  * Koa middleware layer, adds this.log property to koa context
@@ -50,16 +36,14 @@ function createOrUseLogger(logger) {
 
 module.exports = function (loggerInstance) {
 
-    loggerInstance = createOrUseLogger(loggerInstance);
-
     /*
      * Add mongo config into this instance
      * Default mongodb://localhost:27017/applog collection: logs
      */
-    loggerInstance['logmongohost'] = loggerInstance.fields.fields.mongoHost || "localhost";
-    loggerInstance['logmongoport'] = loggerInstance.fields.fields.mongoPort || 27017;
-    loggerInstance['logmongodb'] = loggerInstance.fields.fields.mongoDB || "applog";
-    loggerInstance['logmongocollection'] = loggerInstance.fields.fields.mongoCollection || "logs";
+    loggerInstance['logmongohost'] = loggerInstance.mongoHost || "localhost";
+    loggerInstance['logmongoport'] = loggerInstance.mongoPort || 27017;
+    loggerInstance['logmongodb'] = loggerInstance.mongoDB || "applog";
+    loggerInstance['logmongocollection'] = loggerInstance.mongoCollection || "logs";
     loggerInstance['logmongolink'] = "mongodb://" +
         loggerInstance['logmongohost'] + ":" +
         loggerInstance['logmongoport'] + "/" +
